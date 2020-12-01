@@ -11,6 +11,8 @@ PAGECOLOR = (255, 255, 255)
 FONTCOLOR = (255, 255, 255)
 COMICBOOKDIR = "comic/"
 FONTRATIO = .81 # h/w ratio of font
+TITLEFONT = "comtube/fonts/modeseven.ttf"
+BODYFONT = "comtube/fonts/zig.ttf"
 R = randint(0, 100)
 G = randint(0, 100)
 B = randint(0, 100)
@@ -32,7 +34,7 @@ def createTitlePage(videoId, cover):
     coverImg = cropAndResizeWithinBoundaries(coverImg, PAGE[0], PAGE[1])
     coverImg = comicize(coverImg)
     page.paste(coverImg, (0, 0))
-    page = addText(page, videoId, ["center", "center"], 150)
+    page = addText(page, videoId, ["center", "center"], 150, face=TITLEFONT)
     page = addText(page, f"a YouTube Comic\n-\n{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", ["center", "bottom"], 72)
     path = COMICBOOKDIR + "0.png"
     page.save(path)
@@ -162,7 +164,7 @@ def getWidthAndHeightViaRatio(h, r):
     newWidth = int(newHeight / r)
     return (newWidth, newHeight)
 
-def addText(img, text, align, point, width=0, fill=FONTCOLOR):
+def addText(img, text, align, point, width=0, fill=FONTCOLOR, face=BODYFONT):
     if width == 0:
         width = max(len(l) for l in text.split("\n"))
     w, h = img.size
@@ -189,7 +191,7 @@ def addText(img, text, align, point, width=0, fill=FONTCOLOR):
         y = randint(height, h - (height))
     elif align[1] == "page-number":
         y = int(h) - int(((PADDING - height) * .5) + height) 
-    font = ImageFont.truetype("comtube/fonts/zig.ttg", point)
+    font = ImageFont.truetype(face, point)
     draw.text((x, y), wrapText(text, width, align[0]), font=font, fill=fill)
     return img
 
