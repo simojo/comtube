@@ -10,12 +10,19 @@ PADDING = 15
 PAGECOLOR = (255, 255, 255)
 FONTCOLOR = (255, 255, 255)
 COMICBOOKDIR = "comic/"
-FONTRATIO = .81 # h/w ratio of font
-TITLEFONT = "comtube/fonts/modeseven.ttf"
-BODYFONT = "comtube/fonts/zig.ttf"
 R = randint(0, 100)
 G = randint(0, 100)
 B = randint(0, 100)
+
+class font():
+    ratio = 0.0
+    face = ""
+    def __init__(self, path, ratio):
+        self.face = path
+        self.ratio = ratio
+    
+TITLEFONT = font("comtube/fonts/modeseven.ttf", .63)
+BODYFONT = font("comtube/fonts/zig.ttf", .81)
 
 def createComicBook(videoData):
     path = makeComicBookDir()
@@ -34,7 +41,7 @@ def createTitlePage(videoId, cover):
     coverImg = cropAndResizeWithinBoundaries(coverImg, PAGE[0], PAGE[1])
     coverImg = comicize(coverImg)
     page.paste(coverImg, (0, 0))
-    page = addText(page, videoId, ["center", "center"], 150, face=TITLEFONT)
+    page = addText(page, videoId, ["center", "center"], 150, font=TITLEFONT)
     page = addText(page, f"a YouTube Comic\n-\n{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", ["center", "bottom"], 72)
     path = COMICBOOKDIR + "0.png"
     page.save(path)
@@ -89,7 +96,7 @@ def createFrame(clip, w, h):
     textImg = Image.new("RGBA", (int(w * .8), int(h * .8)), (255, 255, 255, 0))
     textImgWidth, textImgHeight = textImg.size
     point = int(textImgHeight * .05)
-    textImg = addText(textImg, clip.context, ["random", "random"], point, int((textImgWidth * .75) / (FONTRATIO * point)))
+    textImg = addText(textImg, clip.context, ["random", "random"], point, int((textImgWidth * .75) / (BODYFONT.ratio * point)))
     theta = randint(-15, 15)
     textImg = textImg.rotate(theta)
     frame.paste(textImg, (randint(int(textImgWidth * .05), int(w - textImgWidth - (w * .05))), randint(int(textImgHeight * .05), h - textImgHeight)), textImg)
@@ -99,7 +106,7 @@ def createConclusionPage(pageNumber, videoUrl, cover):
     page = Image.open(cover)
     page = cropAndResizeWithinBoundaries(page, PAGE[0], PAGE[1])
     page = comicize(page)
-    page = addText(page, f"The End\n-\n{videoUrl}", ["center", "center"], 40)
+    page = addText(page, f"The End\n-\n{videoUrl}", ["center", "center"], 40, font=TITLEFONT)
     page = addText(page, str(pageNumber), ["center", "page-number"], 20)
     path = f"{COMICBOOKDIR}{pageNumber}.png"
     page.save(path)
@@ -164,13 +171,13 @@ def getWidthAndHeightViaRatio(h, r):
     newWidth = int(newHeight / r)
     return (newWidth, newHeight)
 
-def addText(img, text, align, point, width=0, fill=FONTCOLOR, face=BODYFONT):
+def addText(img, text, align, point, width=0, fill=FONTCOLOR, font=BODYFONT):
     if width == 0:
         width = max(len(l) for l in text.split("\n"))
     w, h = img.size
     x = 0
     y = 0
-    breadth = int(point * width * FONTRATIO)
+    breadth = int(point * width * font.ratio)
     height = int(point * len(text.split("\n")))
     draw = ImageDraw.Draw(img)
     if align[0] == "center":
@@ -190,9 +197,9 @@ def addText(img, text, align, point, width=0, fill=FONTCOLOR, face=BODYFONT):
     elif align[1] == "random":
         y = randint(height, h - (height))
     elif align[1] == "page-number":
-        y = int(h) - int(((PADDING - height) * .5) + height) 
-    font = ImageFont.truetype(face, point)
-    draw.text((x, y), wrapText(text, width, align[0]), font=font, fill=fill)
+        y = int(h) - int(((PADDING - height) * .5) + height)
+    thisFont = ImageFont.truetype(font.face, point)
+    draw.text((x, y), wrapText(text, width, align[0]), font=thisFont, fill=fill)
     return img
 
 def wrapText(text, width, align):
