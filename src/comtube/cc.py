@@ -70,7 +70,7 @@ def fetchInterval(transcript, a, b):
 def determineContext(transcriptRaw):
     global IGNORETAGS
     sentence = ""
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("./comtube/en_core_web_sm-3.0.0/en_core_web_sm/en_core_web_sm-3.0.0")
     tokenized = nlp(transcriptRaw)
     validTokens = [token for token in tokenized if token.pos_ not in IGNORETAGS]
     context = contextStruct(validTokens)
@@ -103,7 +103,7 @@ def mostFrequentWords(validTokens, pos):
     return freqWords
 
 def getNouns(sentence):
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("./comtube/en_core_web_sm-3.0.0/en_core_web_sm/en_core_web_sm-3.0.0")
     tokenized = nlp(sentence)
     return [token.text for token in tokenized if token.pos_ == "NOUN"]
 
