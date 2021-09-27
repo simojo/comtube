@@ -1,6 +1,6 @@
 import cv2 as cv
 import youtube_dl
-from cc import getNouns
+from comtube.cc import getNouns
 from random import choice
 import os
 from re import findall

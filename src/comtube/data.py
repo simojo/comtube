@@ -1,8 +1,8 @@
 """Structs"""
 
 import re
-import cc
-import bubbling
+import comtube.cc as cc
+import comtube.bubbling as bubbling
 
 class videoData:
     videoUrl = ""
